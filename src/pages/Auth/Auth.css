@@ -1,0 +1,733 @@
+.auth-page {
+  display: flex;
+  min-height: 100vh;
+  background: var(--background);
+}
+
+/* ========================================
+   LEFT VISUAL PANEL
+======================================== */
+
+.auth-visual {
+  position: relative;
+  display: flex;
+  width: 47%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--surface-dark);
+  color: #ffffff;
+}
+
+.visual-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px
+    );
+  background-size: 68px 68px;
+  mask-image: linear-gradient(
+    to bottom,
+    black,
+    transparent 82%
+  );
+}
+
+.visual-orbit {
+  position: absolute;
+  border: 1px solid rgba(0, 200, 83, 0.2);
+  border-radius: 50%;
+  transform: rotate(-28deg);
+  pointer-events: none;
+}
+
+.visual-orbit-one {
+  width: 660px;
+  height: 280px;
+  right: -210px;
+  bottom: 13%;
+}
+
+.visual-orbit-two {
+  width: 840px;
+  height: 360px;
+  right: -320px;
+  bottom: 9%;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.visual-spark {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow:
+    0 0 24px 8px rgba(0, 200, 83, 0.24);
+  pointer-events: none;
+}
+
+.spark-one {
+  top: 27%;
+  right: 20%;
+}
+
+.spark-two {
+  right: 34%;
+  bottom: 28%;
+  width: 4px;
+  height: 4px;
+}
+
+/* ========================================
+   WALLET ANIMATION
+======================================== */
+
+.wallet-animation {
+  position: absolute;
+  right: 4%;
+  bottom: 16%;
+  z-index: 1;
+  width: 280px;
+  height: 250px;
+  pointer-events: none;
+}
+
+.wallet-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  width: 150px;
+  height: 80px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(0, 200, 83, 0.2);
+  filter: blur(35px);
+}
+
+.wallet-object {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 82px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(0, 200, 83, 0.45);
+  border-radius: 14px 14px 20px 20px;
+  background: linear-gradient(
+    145deg,
+    rgba(28, 42, 35, 0.95),
+    rgba(12, 22, 17, 0.98)
+  );
+  color: var(--primary);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.wallet-slot {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  width: 58px;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(0, 200, 83, 0.3);
+}
+
+.wallet-coin {
+  position: absolute;
+  left: 50%;
+  bottom: 78px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(0, 200, 83, 0.5);
+  border-radius: 50%;
+  background: rgba(0, 200, 83, 0.08);
+  color: var(--primary);
+  box-shadow:
+    0 0 20px rgba(0, 200, 83, 0.12);
+}
+
+.coin-one {
+  margin-left: -80px;
+}
+
+.coin-two {
+  margin-left: -25px;
+}
+
+.coin-three {
+  margin-left: 35px;
+}
+
+.wallet-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow:
+    0 0 12px rgba(0, 200, 83, 0.7);
+}
+
+.particle-one {
+  top: 60px;
+  right: 25px;
+}
+
+.particle-two {
+  top: 120px;
+  left: 30px;
+}
+
+/* ========================================
+   VISUAL CONTENT
+======================================== */
+
+.visual-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(32px, 5vw, 72px);
+}
+
+.auth-brand,
+.mobile-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  color: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--primary);
+  color: var(--surface-dark);
+}
+
+.visual-copy {
+  max-width: 580px;
+  margin: auto 0;
+  padding: 12vh 0 10vh;
+}
+
+.eyebrow,
+.auth-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 26px;
+  color: var(--primary);
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eyebrow span {
+  width: 26px;
+  height: 1px;
+  background: var(--primary);
+}
+
+.visual-copy h1 {
+  margin: 0;
+  font-size: clamp(3rem, 5vw, 5.4rem);
+  font-weight: 600;
+  letter-spacing: -0.075em;
+  line-height: 0.98;
+}
+
+.visual-copy h1 em {
+  color: var(--primary);
+  font-style: normal;
+}
+
+.visual-description {
+  max-width: 410px;
+  margin: 30px 0 0;
+  color: #a4b1aa;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.visual-footer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #809087;
+  font-size: 0.75rem;
+}
+
+.trust-mark {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #d5e1da;
+}
+
+.trust-mark svg {
+  color: var(--primary);
+}
+
+.visual-footer-separator {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #53645a;
+}
+
+/* ========================================
+   AUTH PANEL
+======================================== */
+
+.auth-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px clamp(28px, 6vw, 110px);
+  color: var(--text);
+}
+
+.auth-card {
+  width: min(100%, 430px);
+}
+
+.mobile-brand {
+  display: none;
+  margin-bottom: 44px;
+  color: var(--text);
+}
+
+.auth-heading {
+  margin-bottom: 28px;
+}
+
+.auth-kicker {
+  margin-bottom: 12px;
+  color: var(--primary-dark);
+  font-size: 0.7rem;
+}
+
+.auth-heading h2 {
+  margin: 0 0 8px;
+  font-size: clamp(1.8rem, 3vw, 2.3rem);
+  letter-spacing: -0.055em;
+  line-height: 1.1;
+}
+
+.auth-heading > p:last-child {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.87rem;
+}
+
+/* ========================================
+   TABS
+======================================== */
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 28px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(
+    in srgb,
+    var(--border) 35%,
+    transparent
+  );
+}
+
+.auth-tabs button {
+  border: 0;
+  border-radius: 7px;
+  padding: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-tabs button.active {
+  background: var(--surface);
+  box-shadow:
+    0 2px 8px rgba(16, 20, 18, 0.07);
+  color: var(--text);
+}
+
+/* ========================================
+   FORM
+======================================== */
+
+.auth-form {
+  display: grid;
+  gap: 17px;
+}
+
+.field-group {
+  display: grid;
+  gap: 8px;
+  color: var(--text);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text-muted);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.input-wrap:focus-within {
+  border-color: var(--primary);
+  box-shadow:
+    0 0 0 3px rgba(0, 200, 83, 0.11);
+}
+
+.input-wrap input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.82rem;
+}
+
+.input-wrap input::placeholder {
+  color: #a9b2ad;
+}
+
+.password-toggle {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  padding: 3px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* ========================================
+   FORM OPTIONS
+======================================== */
+
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -2px 0 2px;
+  font-size: 0.72rem;
+}
+
+.remember-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.remember-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.custom-checkbox {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: transparent;
+}
+
+.remember-option input:checked + .custom-checkbox {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--surface-dark);
+}
+
+.forgot-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--primary-dark);
+  font-size: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ========================================
+   PRIMARY ACTION
+======================================== */
+
+.primary-action,
+.google-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.primary-action {
+  gap: 10px;
+  border: 0;
+  background: var(--primary);
+  color: #062b16;
+}
+
+.primary-action:hover {
+  box-shadow:
+    0 8px 20px rgba(0, 200, 83, 0.2);
+}
+
+/* ========================================
+   DIVIDER
+======================================== */
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 26px 0 18px;
+  color: var(--text-muted);
+}
+
+.divider span {
+  height: 1px;
+  flex: 1;
+  background: var(--border);
+}
+
+.divider small {
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+/* ========================================
+   GOOGLE
+======================================== */
+
+.google-action {
+  gap: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.google-action:hover {
+  border-color: #c8d1cc;
+  box-shadow:
+    0 6px 18px rgba(16, 20, 18, 0.06);
+}
+
+.google-mark {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  color: #4285f4;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* ========================================
+   TERMS + SUPPORT
+======================================== */
+
+.terms-copy {
+  max-width: 340px;
+  margin: 22px auto 0;
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.terms-copy a,
+.support-copy a {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.terms-copy a:hover,
+.support-copy a:hover,
+.forgot-link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+.support-copy {
+  margin: 30px 0 0;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+/* ========================================
+   TABLET
+======================================== */
+
+@media (max-width: 900px) {
+  .auth-visual {
+    width: 42%;
+  }
+
+  .visual-copy h1 {
+    font-size: clamp(2.6rem, 5vw, 4rem);
+  }
+
+  .visual-footer {
+    display: block;
+    line-height: 1.8;
+  }
+
+  .visual-footer-separator {
+    display: none;
+  }
+
+  .trust-mark {
+    margin-bottom: 4px;
+  }
+
+  .wallet-animation {
+    right: -5%;
+    bottom: 14%;
+    transform: scale(0.8);
+  }
+
+  .auth-panel {
+    padding-inline: clamp(24px, 5vw, 64px);
+  }
+}
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 680px) {
+  .auth-page {
+    display: block;
+  }
+
+  .auth-visual {
+    width: 100%;
+    min-height: 320px;
+  }
+
+  .visual-content {
+    padding: 28px 24px;
+  }
+
+  .visual-copy {
+    padding: 36px 0 22px;
+  }
+
+  .visual-copy h1 {
+    font-size: clamp(2.5rem, 11vw, 4rem);
+  }
+
+  .visual-description {
+    margin-top: 18px;
+    font-size: 0.86rem;
+  }
+
+  .visual-footer {
+    display: none;
+  }
+
+  .visual-orbit-one {
+    right: -340px;
+    bottom: -80px;
+  }
+
+  .visual-orbit-two {
+    right: -470px;
+    bottom: -110px;
+  }
+
+  .wallet-animation {
+    right: -8%;
+    bottom: 2%;
+    transform: scale(0.62);
+    opacity: 0.8;
+  }
+
+  .auth-panel {
+    min-height: calc(100vh - 320px);
+    padding: 44px 24px 32px;
+  }
+
+  .mobile-brand {
+    display: inline-flex;
+  }
+
+  .support-copy {
+    margin-top: 26px;
+  }
+}
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 380px) {
+  .form-options {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
