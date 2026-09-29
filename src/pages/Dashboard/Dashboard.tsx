@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useState } from 'react'
 
 import {
   Area,
@@ -20,6 +21,7 @@ import {
   Sparkles,
   TrendingUp,
   Wallet2,
+  Accessibility,
 } from 'lucide-react'
 import NexaAI from '../../components/NexaAI/NexaAI'
 import type { AppSettings } from '../../context/appSettings'
@@ -78,6 +80,7 @@ const quickActions = [
   { label: 'Sell', icon: ArrowUpRight, tone: 'sell' },
   { label: 'Deposit', icon: Download, tone: 'deposit' },
   { label: 'Withdraw', icon: ArrowDownRight, tone: 'withdraw' },
+  { label: 'Accessibility', icon: Accessibility, tone: 'accessibility' },
 ]
 
 const fadeUp = {
@@ -116,6 +119,7 @@ function CustomTooltip({ active, payload, label, currency, showBalances }: Custo
 function Dashboard() {
   const { settings } = useAppSettings()
   const { currency, fullName, showBalances, compactMode } = settings
+  const [showAccessibilityModal, setShowAccessibilityModal] = useState(false)
   const dailyPnl = 8240.4
   const dailyChange = 1.53
   const displayBalance = (amount: number) =>
@@ -385,7 +389,16 @@ function Dashboard() {
           custom={7}
         >
           {quickActions.map(({ label, icon: Icon, tone }) => (
-            <button key={label} className={`action-button ${tone}`} type="button">
+            <button
+              key={label}
+              className={`action-button ${tone}`}
+              type="button"
+              onClick={() => {
+                if (label === 'Accessibility') {
+                  setShowAccessibilityModal(true)
+                }
+              }}
+            >
               <span className="action-icon">
                 <Icon size={18} />
               </span>
@@ -393,6 +406,55 @@ function Dashboard() {
             </button>
           ))}
         </motion.section>
+
+        {showAccessibilityModal && (
+          <div className="accessibility-modal-overlay" onClick={() => setShowAccessibilityModal(false)}>
+            <div className="accessibility-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="accessibility-modal-header">
+                <h2>Accessibility Settings</h2>
+                <button
+                  className="close-button"
+                  onClick={() => setShowAccessibilityModal(false)}
+                  aria-label="Close accessibility settings"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="accessibility-modal-content">
+                <div className="accessibility-option">
+                  <label htmlFor="text-size">
+                    <input
+                      id="text-size"
+                      type="checkbox"
+                      defaultChecked={settings.fontSize === 'large'}
+                    />
+                    <span>Increase text size</span>
+                  </label>
+                </div>
+                <div className="accessibility-option">
+                  <label htmlFor="high-contrast">
+                    <input
+                      id="high-contrast"
+                      type="checkbox"
+                      defaultChecked={settings.highContrast}
+                    />
+                    <span>High contrast mode</span>
+                  </label>
+                </div>
+                <div className="accessibility-option">
+                  <label htmlFor="reduce-motion">
+                    <input
+                      id="reduce-motion"
+                      type="checkbox"
+                      defaultChecked={settings.reduceMotion}
+                    />
+                    <span>Reduce motion</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </motion.div>
     </div>
   )

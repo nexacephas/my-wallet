@@ -18,6 +18,9 @@ export type AppSettings = {
   showBalances: boolean
   compactMode: boolean
   biometric: boolean
+  fontSize: 'normal' | 'large'
+  highContrast: boolean
+  reduceMotion: boolean
 }
 
 export const STORAGE_KEY = 'nexa-settings'
@@ -40,6 +43,9 @@ export const defaultSettings: AppSettings = {
   showBalances: true,
   compactMode: false,
   biometric: true,
+  fontSize: 'normal',
+  highContrast: false,
+  reduceMotion: false,
 }
 
 export type AppSettingsContextValue = {

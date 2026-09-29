@@ -52,6 +52,9 @@ function readSettings(): AppSettings {
       showBalances: validBoolean(value.showBalances, defaultSettings.showBalances),
       compactMode: validBoolean(value.compactMode, defaultSettings.compactMode),
       biometric: validBoolean(value.biometric, defaultSettings.biometric),
+      fontSize: validEnum(value.fontSize, ['normal', 'large'], defaultSettings.fontSize),
+      highContrast: validBoolean(value.highContrast, defaultSettings.highContrast),
+      reduceMotion: validBoolean(value.reduceMotion, defaultSettings.reduceMotion),
     }
   } catch {
     return defaultSettings
