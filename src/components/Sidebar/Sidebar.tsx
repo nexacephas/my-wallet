@@ -9,10 +9,11 @@ import {
   BarChart3,
   BrainCircuit,
   CandlestickChart,
+  Coins,
   Sparkles,
   X,
 } from 'lucide-react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import './Sidebar.css'
 
 type SidebarProps = {
@@ -24,12 +25,20 @@ const primaryLinks = [
   { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
   { label: 'AI Insights', path: '/ai-insights', icon: BrainCircuit },
   { label: 'Markets', path: '/markets', icon: BarChart3 },
+  { label: 'Convert', path: '/convert', icon: Coins },
   { label: 'Trade', path: '/trade', icon: CandlestickChart },
   { label: 'Wallet', path: '/wallet', icon: WalletCards },
   { label: 'Transactions', path: '/transactions', icon: ArrowLeftRight },
 ]
 
 function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    onMobileClose()
+    navigate('/auth', { replace: true })
+  }
+
   return (
     <>
       <AnimatePresence>
@@ -91,7 +100,15 @@ function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
           <div className="sidebar-user">
             <div className="sidebar-avatar">AM</div>
             <div className="sidebar-user-copy"><strong>Alex Morgan</strong><span>Pro account</span></div>
-            <LogOut size={16} aria-hidden="true" />
+            <button
+              className="sidebar-logout-button"
+              type="button"
+              aria-label="Log out"
+              title="Log out"
+              onClick={handleLogout}
+            >
+              <LogOut size={16} aria-hidden="true" />
+            </button>
           </div>
         </div>
       </motion.aside>

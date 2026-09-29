@@ -77,6 +77,7 @@
   display: grid;
   place-items: center;
   pointer-events: none;
+  transform: translateY(calc(0px - clamp(56px, 11vh, 84px)));
 }
 
 .intro-orbit {

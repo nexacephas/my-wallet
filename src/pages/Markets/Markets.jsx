@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
-  ArrowDownRight,
+  ArrowLeft,
   ArrowUpRight,
   BarChart3,
   Bitcoin,
@@ -100,7 +101,65 @@ const markets = [
     favorite: false,
     trend: [68, 66, 64, 65, 60, 62, 57, 55, 56, 52, 49, 46],
   },
+  {
+    id: 'ada',
+    name: 'Cardano',
+    symbol: 'ADA',
+    price: 0.4521,
+    change24h: 1.7,
+    change7d: 3.6,
+    marketCap: '$15.9B',
+    volume: '$412M',
+    icon: CircleDollarSign,
+    accent: 'ada',
+    favorite: false,
+    trend: [40, 42, 41, 45, 43, 46, 48, 47, 52, 50, 54, 57],
+  },
+  {
+    id: 'doge',
+    name: 'Dogecoin',
+    symbol: 'DOGE',
+    price: 0.1642,
+    change24h: 2.3,
+    change7d: 5.8,
+    marketCap: '$23.6B',
+    volume: '$1.1B',
+    icon: CircleDollarSign,
+    accent: 'doge',
+    favorite: false,
+    trend: [38, 40, 39, 44, 43, 47, 45, 51, 53, 50, 56, 60],
+  },
+  {
+    id: 'dot',
+    name: 'Polkadot',
+    symbol: 'DOT',
+    price: 4.21,
+    change24h: -0.7,
+    change7d: 1.2,
+    marketCap: '$6.2B',
+    volume: '$138M',
+    icon: CircleDollarSign,
+    accent: 'dot',
+    favorite: false,
+    trend: [59, 57, 60, 55, 58, 54, 56, 53, 57, 55, 58, 56],
+  },
+  {
+    id: 'link',
+    name: 'Chainlink',
+    symbol: 'LINK',
+    price: 14.35,
+    change24h: 3.1,
+    change7d: 7.4,
+    marketCap: '$8.4B',
+    volume: '$284M',
+    icon: CircleDollarSign,
+    accent: 'link',
+    favorite: false,
+    trend: [34, 37, 36, 42, 40, 45, 43, 50, 52, 49, 57, 62],
+  },
 ]
+
+const pageSize = 5
 
 const categories = [
   { label: 'All markets', value: 'all' },
@@ -172,10 +231,100 @@ function MiniChart({ values, negative = false }) {
   )
 }
 
-function Markets() {
-  const [activeCategory, setActiveCategory] = useState('all')
+function MarketDetail({ market }) {
+  const navigate = useNavigate()
+  const Icon = market.icon
+  const isPositive = market.change24h >= 0
 
+  return (
+    <main className="markets-page">
+      <div className="markets-shell market-detail-shell">
+        <button
+          className="market-detail-back"
+          type="button"
+          onClick={() => navigate('/markets')}
+        >
+          <ArrowLeft size={16} />
+          All markets
+        </button>
+
+        <section className="market-detail-heading">
+          <div className="market-detail-identity">
+            <div className={`asset-icon ${market.accent}`}><Icon size={24} /></div>
+            <div>
+              <span className="markets-eyebrow">SPOT MARKET</span>
+              <h1>{market.name} <span>{market.symbol}/USD</span></h1>
+            </div>
+          </div>
+          <div className="market-detail-price">
+            <strong>{formatPrice(market.price)}</strong>
+            <span className={isPositive ? 'positive' : 'negative'}>
+              {isPositive ? '+' : ''}{market.change24h}% <small>24h</small>
+            </span>
+          </div>
+        </section>
+
+        <div className="market-detail-grid">
+          <section className="market-detail-panel market-detail-chart-panel">
+            <div className="market-detail-panel-heading">
+              <div>
+                <span className="section-kicker">PRICE PERFORMANCE</span>
+                <h2>{market.name} price trend</h2>
+              </div>
+              <span className="market-detail-range">7D</span>
+            </div>
+            <div className={`market-detail-chart ${isPositive ? 'positive' : 'negative'}`}>
+              <MiniChart values={market.trend} negative={!isPositive} />
+            </div>
+            <div className="market-detail-chart-labels"><span>7 days ago</span><span>Today</span></div>
+          </section>
+
+          <aside className="market-detail-panel market-detail-stats">
+            <div className="market-detail-panel-heading">
+              <div>
+                <span className="section-kicker">MARKET DATA</span>
+                <h2>Key statistics</h2>
+              </div>
+            </div>
+            <div className="market-detail-stat"><span>Market cap</span><strong>{market.marketCap}</strong></div>
+            <div className="market-detail-stat"><span>24h volume</span><strong>{market.volume}</strong></div>
+            <div className="market-detail-stat">
+              <span>24h change</span>
+              <strong className={isPositive ? 'positive' : 'negative'}>{isPositive ? '+' : ''}{market.change24h}%</strong>
+            </div>
+            <div className="market-detail-stat">
+              <span>7d change</span>
+              <strong className={market.change7d >= 0 ? 'positive' : 'negative'}>{market.change7d >= 0 ? '+' : ''}{market.change7d}%</strong>
+            </div>
+            <button className="market-detail-trade" type="button" onClick={() => navigate('/trade')}>
+              Trade {market.symbol}<ArrowUpRight size={15} />
+            </button>
+          </aside>
+        </div>
+
+        <section className="market-detail-note">
+          <div className={`asset-icon ${market.accent}`}><Icon size={18} /></div>
+          <div>
+            <span className="section-kicker">ASSET OVERVIEW</span>
+            <h2>{market.name} market snapshot</h2>
+            <p>
+              {market.symbol} is trading at {formatPrice(market.price)} with a{' '}
+              {Math.abs(market.change24h)}% {isPositive ? 'gain' : 'decline'} over the past 24 hours.
+              Figures shown are sample market data.
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+  )
+}
+
+function Markets() {
+  const navigate = useNavigate()
+  const { symbol } = useParams()
+  const [activeCategory, setActiveCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
   const [favorites, setFavorites] = useState(
     new Set(markets.filter((market) => market.favorite).map((market) => market.id)),
   )
@@ -207,7 +356,17 @@ function Markets() {
     })
   }, [activeCategory, favorites, searchQuery])
 
+  const pageCount = Math.max(1, Math.ceil(filteredMarkets.length / pageSize))
+  const pageMarkets = filteredMarkets.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  )
+  const selectedMarket = markets.find(
+    (market) => market.symbol.toLowerCase() === symbol?.toLowerCase(),
+  )
+
   const toggleFavorite = (id) => {
+    setCurrentPage(1)
     setFavorites((current) => {
       const next = new Set(current)
 
@@ -219,6 +378,25 @@ function Markets() {
 
       return next
     })
+  }
+
+  const openMarket = (market) => {
+    navigate(`/markets/${market.symbol.toLowerCase()}`)
+  }
+
+  if (symbol) {
+    if (selectedMarket) return <MarketDetail market={selectedMarket} />
+
+    return (
+      <main className="markets-page">
+        <div className="markets-shell markets-empty market-not-found">
+          <strong>Market not found</strong>
+          <button className="market-detail-back" type="button" onClick={() => navigate('/markets')}>
+            <ArrowLeft size={16} /> Back to markets
+          </button>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -311,6 +489,16 @@ function Markets() {
                 <motion.article
                   key={market.id}
                   className={`mover-card ${market.accent}`}
+                  role="link"
+                  tabIndex={0}
+                  aria-label={`View ${market.name} market details`}
+                  onClick={() => openMarket(market)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      openMarket(market)
+                    }
+                  }}
                   whileHover={{ y: -3 }}
                   transition={{ duration: 0.2 }}
                 >
@@ -374,7 +562,10 @@ function Markets() {
                 type="search"
                 placeholder="Search assets..."
                 value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
+                onChange={(event) => {
+                  setCurrentPage(1)
+                  setSearchQuery(event.target.value)
+                }}
                 aria-label="Search markets"
               />
             </div>
@@ -389,7 +580,10 @@ function Markets() {
                     ? 'market-tab active'
                     : 'market-tab'
                 }
-                onClick={() => setActiveCategory(category.value)}
+                onClick={() => {
+                  setCurrentPage(1)
+                  setActiveCategory(category.value)
+                }}
               >
                 {category.label}
               </button>
@@ -409,7 +603,7 @@ function Markets() {
             </div>
 
             <div className="markets-list">
-              {filteredMarkets.map((market, index) => {
+              {pageMarkets.map((market, index) => {
                 const Icon = market.icon
                 const isPositive = market.change24h >= 0
                 const isPositive7d = market.change7d >= 0
@@ -418,6 +612,17 @@ function Markets() {
                   <motion.div
                     key={market.id}
                     className="market-row"
+                    role="link"
+                    tabIndex={0}
+                    aria-label={`View ${market.name} market details`}
+                    onClick={() => openMarket(market)}
+                    onKeyDown={(event) => {
+                      if (event.target !== event.currentTarget) return
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        openMarket(market)
+                      }
+                    }}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
@@ -432,7 +637,10 @@ function Markets() {
                             ? 'favorite-button active'
                             : 'favorite-button'
                         }
-                        onClick={() => toggleFavorite(market.id)}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          toggleFavorite(market.id)
+                        }}
                         aria-label={
                           favorites.has(market.id)
                             ? `Remove ${market.name} from favorites`
@@ -501,6 +709,11 @@ function Markets() {
 
                     <button
                       className="market-view-button"
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        openMarket(market)
+                      }}
                       aria-label={`View ${market.name} market`}
                     >
                       <Eye size={17} />
@@ -520,6 +733,46 @@ function Markets() {
               </div>
             )}
           </div>
+
+          {filteredMarkets.length > 0 && (
+            <nav className="market-pagination" aria-label="Market pages">
+              <span className="market-pagination-summary">
+                Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredMarkets.length)} of {filteredMarkets.length}
+              </span>
+              <div className="market-pagination-controls">
+                <button
+                  type="button"
+                  className="market-page-step"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((page) => page - 1)}
+                  aria-label="Previous page"
+                >
+                  Previous
+                </button>
+                {Array.from({ length: pageCount }, (_, index) => index + 1).map((page) => (
+                  <button
+                    type="button"
+                    className={`market-page-number${currentPage === page ? ' active' : ''}`}
+                    key={page}
+                    aria-label={`Page ${page}`}
+                    aria-current={currentPage === page ? 'page' : undefined}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className="market-page-step"
+                  disabled={currentPage === pageCount}
+                  onClick={() => setCurrentPage((page) => page + 1)}
+                  aria-label="Next page"
+                >
+                  Next
+                </button>
+              </div>
+            </nav>
+          )}
         </motion.section>
       </div>
     </main>
