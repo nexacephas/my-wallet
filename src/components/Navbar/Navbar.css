@@ -10,6 +10,7 @@
 .notification-dot { position: absolute; top: 8px; right: 8px; width: 5px; height: 5px; border: 1px solid var(--surface); border-radius: 50%; background: var(--primary); }
 .navbar-profile { display: flex; align-items: center; gap: 9px; margin-left: 7px; border: 0; background: transparent; text-align: left; }
 .navbar-avatar { width: 34px; height: 34px; }
+.navbar-settings-error { color: var(--danger); font-size: 0.68rem; }
 .navbar-profile-copy { display: grid; gap: 1px; }
 .navbar-profile-copy strong { color: var(--text); font-size: 0.72rem; }
 .navbar-profile-copy small { color: var(--text-muted); font-size: 0.62rem; }

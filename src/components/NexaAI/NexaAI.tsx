@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ArrowUp, Sparkles, TrendingUp } from 'lucide-react'
+import { formatCurrency as formatDisplayCurrency } from '../../data/portfolio'
 import './NexaAI.css'
 
 type NexaAIAsset = {
@@ -13,6 +14,8 @@ type NexaAIProps = {
   dailyPnl: number
   dailyChange: number
   assets: NexaAIAsset[]
+  currency: 'USD' | 'NGN' | 'EUR' | 'GBP'
+  showBalances: boolean
 }
 
 const suggestedPrompts = [
@@ -21,14 +24,7 @@ const suggestedPrompts = [
   'Explain my allocation',
 ]
 
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(amount)
-
-function NexaAI({ balance, dailyPnl, dailyChange, assets }: NexaAIProps) {
+function NexaAI({ balance, dailyPnl, dailyChange, assets, currency, showBalances }: NexaAIProps) {
   const [prompt, setPrompt] = useState('')
   const [response, setResponse] = useState('')
   const prefersReducedMotion = useReducedMotion()
@@ -39,6 +35,8 @@ function NexaAI({ balance, dailyPnl, dailyChange, assets }: NexaAIProps) {
   const topThreeAllocation = rankedAssets
     .slice(0, 3)
     .reduce((total, asset) => total + Number.parseFloat(asset.allocation), 0)
+  const formatCurrency = (amount: number) =>
+    showBalances ? formatDisplayCurrency(amount, currency) : '••••••••'
   const signedPnl = `${dailyPnl >= 0 ? '+' : '-'}${formatCurrency(Math.abs(dailyPnl))}`
   const signedChange = `${dailyChange >= 0 ? '+' : ''}${dailyChange.toFixed(2)}%`
 

@@ -1,7 +1,5 @@
-import CountUpModule from 'react-countup'
 import { motion } from 'framer-motion'
 
-const CountUp = (CountUpModule as any)?.default ?? CountUpModule
 import {
   Area,
   AreaChart,
@@ -24,86 +22,56 @@ import {
   Wallet2,
 } from 'lucide-react'
 import NexaAI from '../../components/NexaAI/NexaAI'
+import type { AppSettings } from '../../context/appSettings'
+import { useAppSettings } from '../../context/useAppSettings'
+import {
+  availableBalance,
+  formatCurrency,
+  lockedBalance,
+  portfolioAssets,
+  portfolioTotal,
+} from '../../data/portfolio'
+import { transactions } from '../../data/transactions'
 import './Dashboard.css'
 
 const performanceData = [
-  { day: 'Mon', value: 486000 },
-  { day: 'Tue', value: 498000 },
-  { day: 'Wed', value: 492000 },
-  { day: 'Thu', value: 514000 },
-  { day: 'Fri', value: 528000 },
-  { day: 'Sat', value: 536000 },
-  { day: 'Sun', value: 548000 },
+  { day: 'Mon', multiplier: 0.8869 },
+  { day: 'Tue', multiplier: 0.9088 },
+  { day: 'Wed', multiplier: 0.8978 },
+  { day: 'Thu', multiplier: 0.9380 },
+  { day: 'Fri', multiplier: 0.9635 },
+  { day: 'Sat', multiplier: 0.9781 },
+  { day: 'Sun', multiplier: 1 },
 ]
 
-const assetCards = [
-  {
-    name: 'Bitcoin',
-    ticker: 'BTC',
-    price: 68240,
-    change: 4.8,
-    allocation: '38%',
-    icon: Bitcoin,
-    accent: 'btc',
-  },
-  {
-    name: 'Ethereum',
-    ticker: 'ETH',
-    price: 3480,
-    change: 3.2,
-    allocation: '27%',
-    icon: ShieldCheck,
-    accent: 'eth',
-  },
-  {
-    name: 'Solana',
-    ticker: 'SOL',
-    price: 162,
-    change: 6.5,
-    allocation: '17%',
-    icon: Sparkles,
-    accent: 'sol',
-  },
-]
+const assetIcons = {
+  BTC: Bitcoin,
+  ETH: ShieldCheck,
+  SOL: Sparkles,
+}
 
-const recentTransactions = [
-  {
-    id: 'TX-2048',
-    asset: 'BTC',
-    action: 'Purchase',
-    time: 'Today · 09:42',
-    amount: '+0.42 BTC',
-    value: '$28,600',
-    tone: 'positive',
-  },
-  {
-    id: 'TX-2039',
-    asset: 'ETH',
-    action: 'Sale',
-    time: 'Yesterday · 18:10',
-    amount: '-1.80 ETH',
-    value: '$6,260',
-    tone: 'negative',
-  },
-  {
-    id: 'TX-2031',
-    asset: 'USD',
-    action: 'Deposit',
-    time: 'Yesterday · 10:18',
-    amount: '+$12,000',
-    value: 'Bank transfer',
-    tone: 'positive',
-  },
-  {
-    id: 'TX-2019',
-    asset: 'SOL',
-    action: 'Purchase',
-    time: 'Mon · 15:28',
-    amount: '+18 SOL',
-    value: '$2,890',
-    tone: 'positive',
-  },
-]
+const assetCards = [...portfolioAssets]
+  .sort((first, second) => second.balance * second.price - first.balance * first.price)
+  .slice(0, 3)
+  .map((asset) => ({
+    name: asset.name,
+    ticker: asset.symbol,
+    price: asset.price,
+    change: asset.change,
+    allocation: `${((asset.balance * asset.price / portfolioTotal) * 100).toFixed(1)}%`,
+    icon: assetIcons[asset.symbol as keyof typeof assetIcons] ?? Bitcoin,
+    accent: asset.colorClass,
+  }))
+
+const recentTransactions = transactions.slice(0, 4).map((transaction) => ({
+  id: transaction.id,
+  asset: transaction.asset,
+  action: `${transaction.type[0].toUpperCase()}${transaction.type.slice(1)}`,
+  time: `${transaction.date} · ${transaction.time}`,
+  amount: transaction.amount,
+  value: transaction.value,
+  tone: transaction.type === 'sale' || transaction.type === 'withdrawal' ? 'negative' : 'positive',
+}))
 
 const quickActions = [
   { label: 'Buy', icon: Plus, tone: 'buy' },
@@ -124,7 +92,15 @@ const fadeUp = {
   }),
 }
 
-function CustomTooltip({ active, payload, label }: any) {
+type CustomTooltipProps = {
+  active?: boolean
+  payload?: Array<{ value: number }>
+  label?: string
+  currency: AppSettings['currency']
+  showBalances: boolean
+}
+
+function CustomTooltip({ active, payload, label, currency, showBalances }: CustomTooltipProps) {
   if (!active || !payload || payload.length === 0) {
     return null
   }
@@ -132,16 +108,27 @@ function CustomTooltip({ active, payload, label }: any) {
   return (
     <div className="chart-tooltip">
       <span className="chart-tooltip-label">{label}</span>
-      <strong>${payload[0].value.toLocaleString()}</strong>
+      <strong>{showBalances ? formatCurrency(payload[0].value, currency) : '••••••••'}</strong>
     </div>
   )
 }
 
 function Dashboard() {
+  const { settings } = useAppSettings()
+  const { currency, fullName, showBalances, compactMode } = settings
+  const dailyPnl = 8240.4
+  const dailyChange = 1.53
+  const displayBalance = (amount: number) =>
+    showBalances ? formatCurrency(amount, currency) : '••••••••'
+  const chartData = performanceData.map(({ day, multiplier }) => ({
+    day,
+    value: portfolioTotal * multiplier,
+  }))
+
   return (
     <div className="dashboard-page">
       <motion.div
-        className="dashboard-shell"
+        className={`dashboard-shell${compactMode ? ' compact' : ''}`}
         initial="hidden"
         animate="visible"
       >
@@ -152,7 +139,7 @@ function Dashboard() {
         >
           <div className="dashboard-greeting">
             <p className="dashboard-kicker">Portfolio overview</p>
-            <h2>Welcome back, Alex.</h2>
+            <h2>Welcome back, {fullName.split(/\s+/)[0]}.</h2>
           </div>
 
           <button className="ghost-button" type="button">
@@ -171,19 +158,13 @@ function Dashboard() {
               <div>
                 <p className="metric-label">Total portfolio balance</p>
                 <h3>
-                  <CountUp
-                    end={548000}
-                    prefix="$"
-                    separator=","
-                    decimals={0}
-                    duration={1.2}
-                  />
+                  {displayBalance(portfolioTotal)}
                 </h3>
               </div>
 
               <div className="metric-chip metric-chip-positive">
                 <TrendingUp size={14} />
-                <span>+3.42%</span>
+                <span>+{dailyChange.toFixed(2)}%</span>
               </div>
             </div>
 
@@ -199,26 +180,14 @@ function Dashboard() {
               <div>
                 <small>Available</small>
                 <strong>
-                  <CountUp
-                    end={162400}
-                    prefix="$"
-                    separator=","
-                    decimals={0}
-                    duration={1.1}
-                  />
+                  {displayBalance(availableBalance)}
                 </strong>
               </div>
 
               <div>
-                <small>Invested</small>
+                <small>Locked</small>
                 <strong>
-                  <CountUp
-                    end={228450}
-                    prefix="$"
-                    separator=","
-                    decimals={0}
-                    duration={1.1}
-                  />
+                  {displayBalance(lockedBalance)}
                 </strong>
               </div>
             </div>
@@ -237,15 +206,9 @@ function Dashboard() {
             </div>
 
             <h3 className="metric-number positive">
-              <CountUp
-                end={18380}
-                prefix="$"
-                separator=","
-                decimals={0}
-                duration={1}
-              />
+              {displayBalance(dailyPnl)}
             </h3>
-            <p className="metric-footnote">+4.18% vs yesterday</p>
+            <p className="metric-footnote">+{dailyChange.toFixed(2)}% vs yesterday</p>
           </motion.article>
 
           <motion.article
@@ -261,13 +224,7 @@ function Dashboard() {
             </div>
 
             <h3 className="metric-number">
-              <CountUp
-                end={162400}
-                prefix="$"
-                separator=","
-                decimals={0}
-                duration={1}
-              />
+              {displayBalance(availableBalance)}
             </h3>
             <p className="metric-footnote">Ready for deployment</p>
           </motion.article>
@@ -291,7 +248,7 @@ function Dashboard() {
 
           <div className="chart-wrap">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={performanceData} margin={{ top: 12, right: 8, left: 0, bottom: 0 }}>
+              <AreaChart data={chartData} margin={{ top: 12, right: 8, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="portfolioStroke" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0%" stopColor="#3ddc97" stopOpacity={0.6} />
@@ -310,9 +267,9 @@ function Dashboard() {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: '#8f9a94', fontSize: 12 }}
-                  tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                  tickFormatter={(value) => showBalances ? formatCurrency(value, currency) : '•••'}
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(61,220,151,0.5)', strokeWidth: 1 }} />
+                <Tooltip content={<CustomTooltip currency={currency} showBalances={showBalances} />} cursor={{ stroke: 'rgba(61,220,151,0.5)', strokeWidth: 1 }} />
                 <Area
                   type="monotone"
                   dataKey="value"
@@ -327,10 +284,12 @@ function Dashboard() {
         </motion.section>
 
         <NexaAI
-          balance={548000}
-          dailyPnl={18380}
-          dailyChange={4.18}
+          balance={portfolioTotal}
+          dailyPnl={dailyPnl}
+          dailyChange={dailyChange}
           assets={assetCards.map(({ ticker, allocation }) => ({ ticker, allocation }))}
+          currency={currency}
+          showBalances={showBalances}
         />
 
         <section className="dashboard-lower-grid">
@@ -363,7 +322,7 @@ function Dashboard() {
                   </div>
 
                   <div className="asset-values">
-                    <strong>${price.toLocaleString()}</strong>
+                    <strong>{formatCurrency(price, currency)}</strong>
                     <span className={change >= 0 ? 'positive' : 'negative'}>
                       {change >= 0 ? '+' : ''}
                       {change}%
@@ -411,8 +370,8 @@ function Dashboard() {
                   </div>
 
                   <div className="transaction-amount-wrap">
-                    <strong className={tone === 'negative' ? 'negative' : 'positive'}>{amount}</strong>
-                    <span>{value}</span>
+                    <strong className={tone === 'negative' ? 'negative' : 'positive'}>{showBalances ? amount : '••••••••'}</strong>
+                    <span>{showBalances ? formatCurrency(value, currency) : '••••••••'}</span>
                   </div>
                 </div>
               ))}

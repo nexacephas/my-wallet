@@ -12,6 +12,7 @@ import Trade from './pages/Trade/Trade.jsx'
 import Transactions from './pages/Transactions/Transactions.jsx'
 import Wallet from './pages/Wallet/Wallet.jsx'
 import DashboardLayout from './layouts/DashboardLayout/DashboardLayout.tsx'
+import { AppSettingsProvider } from './context/AppSettingsContext'
 
 function ScrollToTop() {
 	const { pathname } = useLocation()
@@ -25,27 +26,29 @@ function ScrollToTop() {
 
 function App() {
 	return (
-		<>
-		<ScrollToTop />
-		<Routes>
-			<Route path="/" element={<Navigate to="/auth" replace />} />
-			<Route path="/auth" element={<Auth />} />
-			<Route path="/intro" element={<Intro />} />
-			<Route element={<DashboardLayout />}>
-				<Route path="/dashboard" element={<Dashboard />} />
-				<Route path="/ai-insights" element={<AIInsights />} />
-				<Route path="/help-support" element={<HelpSupport />} />
-				<Route path="/convert" element={<Convert />} />
-				<Route path="/markets" element={<Markets />} />
-				<Route path="/markets/:symbol" element={<Markets />} />
-				<Route path="/trade" element={<Trade />} />
-				<Route path="/wallet" element={<Wallet />} />
-				<Route path="/transactions" element={<Transactions />} />
-				<Route path="/settings" element={<Settings />} />
-			</Route>
-			<Route path="*" element={<Navigate to="/auth" replace />} />
-		</Routes>
-		</>
+		<AppSettingsProvider>
+			<>
+				<ScrollToTop />
+				<Routes>
+					<Route path="/" element={<Navigate to="/auth" replace />} />
+					<Route path="/auth" element={<Auth />} />
+					<Route path="/intro" element={<Intro />} />
+					<Route element={<DashboardLayout />}>
+						<Route path="/dashboard" element={<Dashboard />} />
+						<Route path="/ai-insights" element={<AIInsights />} />
+						<Route path="/help-support" element={<HelpSupport />} />
+						<Route path="/convert" element={<Convert />} />
+						<Route path="/markets" element={<Markets />} />
+						<Route path="/markets/:symbol" element={<Markets />} />
+						<Route path="/trade" element={<Trade />} />
+						<Route path="/wallet" element={<Wallet />} />
+						<Route path="/transactions" element={<Transactions />} />
+						<Route path="/settings" element={<Settings />} />
+					</Route>
+					<Route path="*" element={<Navigate to="/auth" replace />} />
+				</Routes>
+			</>
+		</AppSettingsProvider>
 	)
 }
 

@@ -10,6 +10,20 @@
   min-width: 0;
 }
 
+.dashboard-shell.compact {
+  gap: 14px;
+}
+
+.dashboard-shell.compact .metric-card,
+.dashboard-shell.compact .panel-card {
+  padding: 14px;
+}
+
+.dashboard-shell.compact .asset-item,
+.dashboard-shell.compact .transaction-row {
+  padding-block: 8px;
+}
+
 .dashboard-shell > *,
 .dashboard-metrics > *,
 .dashboard-lower-grid > * {

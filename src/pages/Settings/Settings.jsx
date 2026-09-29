@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Bell,
@@ -27,6 +27,8 @@ import {
   UserRound,
   WalletCards,
 } from 'lucide-react'
+import { defaultSettings } from '../../context/appSettings'
+import { useAppSettings } from '../../context/useAppSettings'
 import './Settings.css'
 
 const sessions = [
@@ -71,32 +73,56 @@ function Toggle({ checked, onChange, label }) {
 }
 
 function Settings() {
+  const { settings, updateSettings } = useAppSettings()
   const [activeSection, setActiveSection] = useState('profile')
 
   const [showPassword, setShowPassword] = useState(false)
 
-  const [fullName, setFullName] = useState('Cephas Adekeye')
-  const [username, setUsername] = useState('nexa.cephas')
-  const [email, setEmail] = useState('cephas@nexa.com')
-  const [phone, setPhone] = useState('+234 801 234 5678')
+  const [fullName, setFullName] = useState(settings.fullName)
+  const [username, setUsername] = useState(settings.username)
+  const [email, setEmail] = useState(settings.email)
+  const [phone, setPhone] = useState(settings.phone)
 
-  const [twoFactor, setTwoFactor] = useState(true)
-  const [loginAlerts, setLoginAlerts] = useState(true)
-  const [transactionAlerts, setTransactionAlerts] = useState(true)
-  const [marketAlerts, setMarketAlerts] = useState(false)
-  const [productUpdates, setProductUpdates] = useState(true)
-  const [newsletter, setNewsletter] = useState(false)
+  const [twoFactor, setTwoFactor] = useState(settings.twoFactor)
+  const [loginAlerts, setLoginAlerts] = useState(settings.loginAlerts)
+  const [transactionAlerts, setTransactionAlerts] = useState(settings.transactionAlerts)
+  const [marketAlerts, setMarketAlerts] = useState(settings.marketAlerts)
+  const [productUpdates, setProductUpdates] = useState(settings.productUpdates)
+  const [newsletter, setNewsletter] = useState(settings.newsletter)
 
-  const [currency, setCurrency] = useState('USD')
-  const [language, setLanguage] = useState('English')
-  const [timezone, setTimezone] = useState('Africa/Lagos')
-  const [appearance, setAppearance] = useState('dark')
+  const [currency, setCurrency] = useState(settings.currency)
+  const [language, setLanguage] = useState(settings.language)
+  const [timezone, setTimezone] = useState(settings.timezone)
+  const [appearance, setAppearance] = useState(settings.appearance)
 
-  const [showBalances, setShowBalances] = useState(true)
-  const [compactMode, setCompactMode] = useState(false)
-  const [biometric, setBiometric] = useState(true)
+  const [showBalances, setShowBalances] = useState(settings.showBalances)
+  const [compactMode, setCompactMode] = useState(settings.compactMode)
+  const [biometric, setBiometric] = useState(settings.biometric)
 
   const [saveState, setSaveState] = useState('idle')
+  const [saveError, setSaveError] = useState('')
+
+  useEffect(() => {
+    // Keep the open form draft aligned with saved settings from other tabs.
+    // eslint-disable-next-line react/set-state-in-effect
+    setFullName(settings.fullName)
+    setUsername(settings.username)
+    setEmail(settings.email)
+    setPhone(settings.phone)
+    setTwoFactor(settings.twoFactor)
+    setLoginAlerts(settings.loginAlerts)
+    setTransactionAlerts(settings.transactionAlerts)
+    setMarketAlerts(settings.marketAlerts)
+    setProductUpdates(settings.productUpdates)
+    setNewsletter(settings.newsletter)
+    setCurrency(settings.currency)
+    setLanguage(settings.language)
+    setTimezone(settings.timezone)
+    setAppearance(settings.appearance)
+    setShowBalances(settings.showBalances)
+    setCompactMode(settings.compactMode)
+    setBiometric(settings.biometric)
+  }, [settings])
 
   const sectionMeta = useMemo(
     () => ({
@@ -136,14 +162,37 @@ function Settings() {
 
   const handleSave = () => {
     setSaveState('saving')
+    setSaveError('')
 
-    window.setTimeout(() => {
+    try {
+      updateSettings({
+        ...defaultSettings,
+        fullName,
+        username,
+        email,
+        phone,
+        twoFactor,
+        loginAlerts,
+        transactionAlerts,
+        marketAlerts,
+        productUpdates,
+        newsletter,
+        currency,
+        language,
+        timezone,
+        appearance,
+        showBalances,
+        compactMode,
+        biometric,
+      })
       setSaveState('saved')
-
       window.setTimeout(() => {
         setSaveState('idle')
       }, 2200)
-    }, 650)
+    } catch {
+      setSaveState('idle')
+      setSaveError('Unable to save settings. Check browser storage and try again.')
+    }
   }
 
   const copyUserId = async () => {
@@ -173,7 +222,7 @@ function Settings() {
             </p>
           </div>
 
-          <div className="profile-avatar-large">CA</div>
+          <div className="profile-avatar-large">{fullName.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}</div>
         </div>
 
         <div className="settings-form-grid">
@@ -713,7 +762,7 @@ function Settings() {
             </span>
             <h2>Localization</h2>
             <p>
-              Set how currencies, language and time are displayed.
+              Set how currencies, language and time are displayed. Currency conversions use preview exchange rates.
             </p>
           </div>
         </div>
@@ -935,7 +984,7 @@ function Settings() {
             </span>
             <h1>Settings</h1>
             <p>
-              Manage your account, security and Nexa experience.
+              Manage your account and experience. Changes persist on this device and sync across open tabs.
             </p>
           </div>
 
@@ -964,16 +1013,17 @@ function Settings() {
               </>
             )}
           </button>
+          {saveError && <p className="settings-save-error" role="alert">{saveError}</p>}
         </motion.header>
 
         <div className="settings-layout">
           <aside className="settings-navigation">
             <div className="settings-profile-mini">
-              <div className="settings-profile-avatar">CA</div>
+              <div className="settings-profile-avatar">{fullName.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}</div>
 
               <div>
-                <strong>Cephas Adekeye</strong>
-                <span>nexa.cephas</span>
+                <strong>{fullName}</strong>
+                <span>{username}</span>
               </div>
             </div>
 
@@ -1053,7 +1103,7 @@ function Settings() {
               <div className="settings-nav-security">
                 <LockKeyhole size={15} />
                 <span>
-                  Your settings are stored securely.
+                  Settings are saved on this device.
                 </span>
               </div>
             </div>

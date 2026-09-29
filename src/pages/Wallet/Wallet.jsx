@@ -17,55 +17,15 @@ import {
   WalletCards,
   X,
 } from 'lucide-react'
+import { useAppSettings } from '../../context/useAppSettings'
+import {
+  availableBalance,
+  formatCurrency,
+  lockedBalance,
+  portfolioAssets,
+  portfolioTotal,
+} from '../../data/portfolio'
 import './Wallet.css'
-
-const assets = [
-  {
-    id: 'btc',
-    symbol: 'BTC',
-    name: 'Bitcoin',
-    balance: 2.84,
-    price: 68100,
-    change: 2.84,
-    colorClass: 'btc',
-  },
-  {
-    id: 'eth',
-    symbol: 'ETH',
-    name: 'Ethereum',
-    balance: 15.42,
-    price: 3478,
-    change: 1.72,
-    colorClass: 'eth',
-  },
-  {
-    id: 'sol',
-    symbol: 'SOL',
-    name: 'Solana',
-    balance: 184.6,
-    price: 161.5,
-    change: -0.84,
-    colorClass: 'sol',
-  },
-  {
-    id: 'usdt',
-    symbol: 'USDT',
-    name: 'Tether',
-    balance: 18450,
-    price: 1,
-    change: 0.03,
-    colorClass: 'usdt',
-  },
-  {
-    id: 'usd',
-    symbol: 'USD',
-    name: 'US Dollar',
-    balance: 12640,
-    price: 1,
-    change: 0,
-    colorClass: 'usd',
-  },
-]
 
 const activities = [
   {
@@ -114,12 +74,7 @@ const networks = {
   USD: ['Bank transfer'],
 }
 
-function formatCurrency(value) {
-  return `$${value.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`
-}
+const assets = portfolioAssets
 
 function formatBalance(asset) {
   if (asset.symbol === 'USD' || asset.symbol === 'USDT') {
@@ -155,24 +110,24 @@ function getActivityLabel(type) {
 }
 
 function Wallet() {
+  const { settings, updateSettings } = useAppSettings()
   const [search, setSearch] = useState('')
-  const [showBalance, setShowBalance] = useState(true)
   const [modal, setModal] = useState(null)
   const [selectedAsset, setSelectedAsset] = useState('BTC')
   const [selectedNetwork, setSelectedNetwork] = useState('Bitcoin')
   const [copied, setCopied] = useState(false)
+  const [balanceSaveError, setBalanceSaveError] = useState('')
+  const showBalance = settings.showBalances
+  const totalBalance = portfolioTotal
 
-  const totalBalance = useMemo(
-    () =>
-      assets.reduce(
-        (total, asset) => total + asset.balance * asset.price,
-        0,
-      ),
-    [],
-  )
-
-  const availableBalance = totalBalance - 18450
-  const lockedBalance = 18450
+  const toggleBalanceVisibility = () => {
+    try {
+      updateSettings({ ...settings, showBalances: !showBalance })
+      setBalanceSaveError('')
+    } catch {
+      setBalanceSaveError('Unable to save balance visibility setting.')
+    }
+  }
 
   const filteredAssets = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -217,7 +172,7 @@ function Wallet() {
 
   return (
     <main className="wallet-page">
-      <div className="wallet-shell">
+      <div className={`wallet-shell${settings.compactMode ? ' compact' : ''}`}>
         <motion.header
           className="wallet-header"
           initial={{ opacity: 0, y: 12 }}
@@ -268,7 +223,7 @@ function Wallet() {
                 <button
                   type="button"
                   className="balance-visibility"
-                  onClick={() => setShowBalance((value) => !value)}
+                  onClick={toggleBalanceVisibility}
                   aria-label="Toggle balance visibility"
                 >
                   {showBalance ? (
@@ -287,12 +242,13 @@ function Wallet() {
 
             <div className="wallet-total-balance">
               {showBalance
-                ? formatCurrency(totalBalance)
+                ? formatCurrency(totalBalance, settings.currency)
                 : getMaskedBalance()}
             </div>
+            {balanceSaveError && <p role="alert" className="wallet-settings-error">{balanceSaveError}</p>}
 
             <div className="wallet-balance-change">
-              <span>+$8,240.40</span>
+              <span>{showBalance ? `+${formatCurrency(8240.4, settings.currency)}` : '••••••••'}</span>
               <strong>+1.53%</strong>
               <small>24h</small>
             </div>
@@ -304,7 +260,7 @@ function Wallet() {
                 <span>Available</span>
                 <strong>
                   {showBalance
-                    ? formatCurrency(availableBalance)
+                    ? formatCurrency(availableBalance, settings.currency)
                     : getMaskedBalance()}
                 </strong>
               </div>
@@ -313,7 +269,7 @@ function Wallet() {
                 <span>Locked</span>
                 <strong>
                   {showBalance
-                    ? formatCurrency(lockedBalance)
+                    ? formatCurrency(lockedBalance, settings.currency)
                     : getMaskedBalance()}
                 </strong>
               </div>
@@ -424,16 +380,18 @@ function Wallet() {
                     </div>
 
                     <div className="wallet-asset-price">
-                      {formatCurrency(asset.price)}
+                      {formatCurrency(asset.price, settings.currency)}
                     </div>
 
                     <div className="wallet-asset-balance">
-                      <strong>{formatBalance(asset)}</strong>
+                      <strong>{showBalance ? formatBalance(asset) : '••••••••'}</strong>
                       <span>{asset.symbol}</span>
                     </div>
 
                     <strong className="wallet-asset-value">
-                      {formatCurrency(asset.balance * asset.price)}
+                      {showBalance
+                        ? formatCurrency(asset.balance * asset.price, settings.currency)
+                        : '••••••••'}
                     </strong>
 
                     <span
@@ -523,11 +481,9 @@ function Wallet() {
 
                   <div className="allocation-item-right">
                     <strong>{asset.percentage.toFixed(1)}%</strong>
-                    <span>
-                      {formatCurrency(
-                        asset.balance * asset.price,
-                      )}
-                    </span>
+                    <span>{showBalance
+                      ? formatCurrency(asset.balance * asset.price, settings.currency)
+                      : '••••••••'}</span>
                   </div>
                 </div>
               ))}
@@ -597,7 +553,7 @@ function Wallet() {
                         : 'positive'
                     }
                   >
-                    {activity.amount}
+                    {showBalance ? activity.amount : '••••••••'}
                   </strong>
 
                   <span>{activity.date}</span>

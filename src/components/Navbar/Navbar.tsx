@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAppSettings } from '../../context/useAppSettings'
 import './Navbar.css'
 
 type NavbarProps = {
@@ -87,29 +88,26 @@ const initialNotifications = [
   },
 ]
 
-function getInitialTheme() {
-  try {
-    const savedTheme = window.localStorage.getItem('nexa-theme')
-    if (savedTheme === 'dark' || savedTheme === 'light') return savedTheme
-  } catch {
-    // Keep the current document theme when storage is unavailable.
-  }
-
-  return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
-}
-
 function Navbar({ onMobileMenuOpen }: NavbarProps) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const [theme, setTheme] = useState(getInitialTheme)
+  const { settings, updateSettings } = useAppSettings()
   const [openPanel, setOpenPanel] = useState<'search' | 'notifications' | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [notifications, setNotifications] = useState(initialNotifications)
+  const [settingsError, setSettingsError] = useState('')
   const popoverRef = useRef<HTMLDivElement>(null)
   const page = pageTitles[pathname] ?? (pathname.startsWith('/markets/')
     ? { title: 'Markets', detail: 'Asset market details' }
     : pageTitles['/dashboard'])
-  const isDark = theme === 'dark'
+  const isDark = document.documentElement.dataset.theme === 'dark'
+  const initials = settings.fullName
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
   const unreadCount = notifications.filter((notification) => notification.unread).length
   const filteredSearchItems = useMemo(() => {
     const query = searchQuery.trim().toLowerCase()
@@ -144,13 +142,14 @@ function Navbar({ onMobileMenuOpen }: NavbarProps) {
   }, [])
 
   const toggleTheme = () => {
-    const nextTheme = isDark ? 'light' : 'dark'
-    document.documentElement.dataset.theme = nextTheme
-    setTheme(nextTheme)
     try {
-      window.localStorage.setItem('nexa-theme', nextTheme)
+      updateSettings({
+        ...settings,
+        appearance: isDark ? 'light' : 'dark',
+      })
+      setSettingsError('')
     } catch {
-      // Theme still applies for this session when storage is unavailable.
+      setSettingsError('Unable to save appearance preference.')
     }
   }
 
@@ -260,9 +259,10 @@ function Navbar({ onMobileMenuOpen }: NavbarProps) {
         <button className="navbar-icon-button" type="button" aria-label={isDark ? 'Use light theme' : 'Use dark theme'} onClick={toggleTheme}>
           {isDark ? <Sun size={19} /> : <Moon size={19} />}
         </button>
+        {settingsError && <span className="navbar-settings-error" role="alert">{settingsError}</span>}
         <button className="navbar-profile" type="button" aria-label="Open profile menu">
-          <span className="navbar-avatar">AM</span>
-          <span className="navbar-profile-copy"><strong>Alex Morgan</strong><small>Pro account</small></span>
+          <span className="navbar-avatar">{initials}</span>
+          <span className="navbar-profile-copy"><strong>{settings.fullName}</strong><small>Pro account</small></span>
         </button>
       </div>
     </header>

@@ -11,6 +11,22 @@
   padding: 34px 34px 60px;
 }
 
+.wallet-shell.compact .wallet-asset-row {
+  min-height: 60px;
+  padding-block: 6px;
+}
+
+.wallet-shell.compact .wallet-assets-panel,
+.wallet-shell.compact .wallet-overview > * {
+  padding: 16px;
+}
+
+.wallet-settings-error {
+  margin: 8px 0 0;
+  color: var(--danger);
+  font-size: 0.75rem;
+}
+
 .wallet-header {
   display: flex;
   align-items: flex-end;

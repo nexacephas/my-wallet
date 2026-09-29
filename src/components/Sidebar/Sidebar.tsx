@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useAppSettings } from '../../context/useAppSettings'
 import './Sidebar.css'
 
 type SidebarProps = {
@@ -33,6 +34,14 @@ const primaryLinks = [
 
 function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
   const navigate = useNavigate()
+  const { settings } = useAppSettings()
+  const initials = settings.fullName
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 
   const handleLogout = () => {
     onMobileClose()
@@ -98,8 +107,8 @@ function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
             <span>Help &amp; Support</span>
           </NavLink>
           <div className="sidebar-user">
-            <div className="sidebar-avatar">AM</div>
-            <div className="sidebar-user-copy"><strong>Alex Morgan</strong><span>Pro account</span></div>
+            <div className="sidebar-avatar">{initials}</div>
+            <div className="sidebar-user-copy"><strong>{settings.fullName}</strong><span>Pro account</span></div>
             <button
               className="sidebar-logout-button"
               type="button"
